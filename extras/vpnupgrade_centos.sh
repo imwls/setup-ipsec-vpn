@@ -154,15 +154,14 @@ restorecon /etc/ipsec.d/*db 2>/dev/null
 restorecon /usr/local/sbin -Rv 2>/dev/null
 restorecon /usr/local/libexec/ipsec -Rv 2>/dev/null
 
-# Update ipsec.conf options
+# Update ipsec.conf for Libreswan 3.19 and newer
 IKE_NEW="  ike=3des-sha1,3des-sha1;modp1024,aes-sha1,aes-sha1;modp1024,aes-sha2,aes-sha2;modp1024"
 PHASE2_NEW="  phase2alg=3des-sha1,aes-sha1,aes-sha2"
-sed -i.old -e "s/^[[:space:]]\+auth=esp\$/  phase2=esp/" \
+sed -i".old-$(date +%Y-%m-%d-%H:%M:%S)" \
+    -e "s/^[[:space:]]\+auth=esp\$/  phase2=esp/" \
     -e "s/^[[:space:]]\+forceencaps=yes\$/  encapsulation=yes/" \
-    -e "s/^[[:space:]]\+ike=3des-sha1,aes-sha1\$/$IKE_NEW/" \
-    -e "s/^[[:space:]]\+ike=3des-sha1,aes-sha1,aes256-sha2_512,aes256-sha2_256\$/$IKE_NEW/" \
-    -e "s/^[[:space:]]\+phase2alg=3des-sha1,aes-sha1\$/$PHASE2_NEW/" \
-    -e "s/^[[:space:]]\+phase2alg=3des-sha1,aes-sha1,aes256-sha2_512,aes256-sha2_256\$/$PHASE2_NEW/" /etc/ipsec.conf
+    -e "s/^[[:space:]]\+ike=.\+\$/$IKE_NEW/" \
+    -e "s/^[[:space:]]\+phase2alg=.\+\$/$PHASE2_NEW/" /etc/ipsec.conf
 
 # Restart IPsec service
 service ipsec restart
